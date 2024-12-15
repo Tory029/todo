@@ -1,11 +1,11 @@
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine#, MetaData
 from sqlalchemy.orm import sessionmaker, declarative_base
+from config import settings
 
 
-DATABASE_URL = "postgresql+psycopg2://todo:Dd7878789@localhost:5433/todo_db"
+DATABASE_URL = settings.DATABASE_URL
 engine = create_engine(DATABASE_URL)
 session_local = sessionmaker(bind=engine, autocommit=False, autoflush=False)
-metadata = MetaData()
 
 
 Base = declarative_base()
