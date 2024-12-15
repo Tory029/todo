@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from models.todos import Todo
 from database.db import init_db, session_local
 from schemas.todos import TodoSchema
+from config import settings
 
 app = FastAPI()
 
@@ -66,6 +67,6 @@ if __name__ == '__main__':
     uvicorn.run(
         "main:app", 
         reload=True,
-        host="localhost",
-        port=8000
+        host=settings.HOST,
+        port=settings.PORT
     )

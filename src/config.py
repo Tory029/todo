@@ -5,7 +5,7 @@ load_dotenv()
 
 class Settings():
     DATABASE_URL = os.getenv("DATABASE_URL")
-    PORT = os.getenv("PORT")
+    PORT = int(os.getenv("PORT"))
     HOST = os.getenv("HOST")
 
 settings = Settings()
