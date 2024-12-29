@@ -1,21 +1,25 @@
-from datetime import datetime
 from pydantic import BaseModel
+import enum
+
+class TodoStatus(enum.Enum):
+       todo = "todo"
+       in_progress = "in_progress"
+       done = "done"
 
 
 class TodoSchema(BaseModel):
     name: str
     description: str
-    created_at: datetime.now
-    closed_at: datetime.now
+
 
     class Config:
         from_attributes = True
 
 
-class TodoRead(BaseModel):
-    id: int
-
-
 class TodoUpdate(TodoSchema):
     id: int
-    status: any
+    status: TodoStatus
+
+
+class TodoRead(BaseModel):
+    id: int

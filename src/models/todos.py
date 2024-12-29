@@ -2,14 +2,9 @@ import enum
 from datetime import datetime
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import Integer, String, Column, Enum, DateTime
-from schemas.todos import TodoSchema
+from schemas.todos import TodoUpdate, TodoStatus
 
 Base = declarative_base()
-
-class TodoStatus(enum.Enum):
-       todo = "todo"
-       in_progress = "in_progress"
-       done = "done"
 
 
 class Todo(Base):
@@ -22,8 +17,8 @@ class Todo(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
-    def to_read_model(self) -> TodoSchema:
-          return TodoSchema(
+    def to_read_model(self) -> TodoUpdate:
+          return TodoUpdate(
                 id=self.id,
                 name=self.name,
                 description=self.description,
