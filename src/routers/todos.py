@@ -1,41 +1,34 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from schemas.todos import TodoSchema, TodoUpdate, TodoRead
+from schemas.todos import TodoResponse, TodoRead, TodoListResponse, TodoCreate, TodoListCreate
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from models.todos import Todo
-from database.db import get_db
+from models.todos import Todo, TodoList
+from database.db import get_db, SessionLocal
 from typing import Optional
 
 
-router = APIRouter()
+router = APIRouter(tags=["todo"])
 
-
-@router.post("/todos/")
-async def create_todo(
-    todo_schema: TodoSchema, 
-    db: Session = Depends(get_db)
-):
-
-    todo = Todo(name=todo_schema.name, description=todo_schema.description)
+@router.post("/todos/", response_model=TodoResponse)
+def create_todo(todo: TodoCreate, db: SessionLocal = Depends(get_db)):
+    todo = Todo(name = TodoCreate.name, description = TodoCreate.descriptioon)
     db.add(todo)
-    db.commit()
     db.refresh(todo)
-    return todo
+    db.commit()
 
-
-@router.get("/todos/", response_model=dict)
+@router.get("/todos/")
 def read_list_todo(
     page: int = Query(1, ge=1),
     page_size: int = Query(5, ge=1),
     status: Optional[str] = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
 
     query = select(Todo)
     while status:
-        query = query.where(Todo.status == status)
+        query = query.where(TodoList.status == status)
 
-    total_todos = db.execute(query).scalars().all()
+    total_todos = db.execute(query).scalars().count()
     total_pages = (total_todos + page_size-1) // page_size
 
     start = (page -1) * page_size
@@ -49,24 +42,17 @@ def read_list_todo(
         "tasks": paginated_todos,
     }
 
-
-@router.get("todos/{todos_id}")
-def read_todo(
-    todo_schema: TodoRead, 
-    db: Session = Depends(get_db)
-):
-    todo = db.query(Todo).filter(Todo.id == TodoSchema.id).first()
+@router.get("todos/{todo_id}")
+def read_todo(todo_id: int, db: SessionLocal = Depends(get_db)):
+    todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if todo is None:
         raise HTTPException(status_code=404, detail="No todo were found")
     return todo
 
 
-@router.put("/todos/{todos_id}")
-def update_todo(
-    todo_schema: TodoUpdate, 
-    db: Session = Depends(get_db)
-):
-    todo = db.query(Todo).filter(Todo.id == TodoSchema.id).first()
+@router.put("/todos/{todo_id}")
+def update_todo(todo_schema: TodoResponse, db: SessionLocal = Depends(get_db)):
+    todo = db.query(Todo).filter(Todo.id == TodoResponse.id).first()
     if todo is None:
         raise HTTPException(detail="No todos were found")
 
@@ -78,12 +64,12 @@ def update_todo(
     return todo
 
 
-@router.delete("/todos/{todos_id}")
+@router.delete("/todos/{todo_id}")
 def delete_todo(
-    todo_schema: TodoRead, 
-    db: Session = Depends(get_db)
+    todo_id: int, 
+    db: SessionLocal = Depends(get_db)
 ):
-    todo = db.query(Todo).filter(Todo.id == todo_schema.id).first()
+    todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if todo is None:
         raise HTTPException(detail="No todos were found")
 
