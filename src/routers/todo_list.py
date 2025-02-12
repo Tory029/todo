@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from models.todos import TodoList
+from models.todos import TodoList, Todo
 from schemas.todos import TodoListCreate, TodoListResponse, TodoCreate
 from database.db import get_db, SessionLocal
 from sqlalchemy.orm import Session
@@ -8,9 +8,10 @@ from typing import List
 
 router2 = APIRouter(tags=["todo_list"])
 
-@router2.post("/todos_list/", response_model=TodoListResponse)
-def create_todo(todo_list: TodoListCreate, db: SessionLocal = Depends(get_db)):
-    todo = TodoList(name=TodoListCreate.name, description=TodoCreate.descriptioon)
+
+@router2.post("/todos_lists/", response_model=TodoListResponse)
+def create_todo(todo_list: TodoListCreate, status: str, db: SessionLocal = Depends(get_db)):
+    todo = TodoList(name=todo_list.name, description=todo_list.description, status=status)
     db.add(todo)
     db.refresh(todo)
     db.commit()
@@ -27,3 +28,4 @@ def delete_todos_list(list_id: int, db: Session = Depends(get_db)):
     
     db.delete(db_todo_list)
     db.commit()
+

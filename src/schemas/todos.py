@@ -25,3 +25,7 @@ class TodoListCreate(BaseModel):
 class TodoListResponse(TodoListCreate):
     id: int
     todos: List[TodoResponse] = []
+
+class User(BaseModel):
+    username: str
+    password: str
