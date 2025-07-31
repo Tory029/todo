@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy import Integer, String, Column, Enum, DateTime, ForeignKey
-from schemas import TodoStatus
+from src.schemas import TodoStatus
 
 
 Base = declarative_base()
